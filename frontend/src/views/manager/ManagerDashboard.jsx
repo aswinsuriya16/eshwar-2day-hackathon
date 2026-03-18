@@ -54,6 +54,9 @@ export function ManagerDashboard() {
   const [reviewRating, setReviewRating] = useState(5)
   const [reviewSubmitting, setReviewSubmitting] = useState(false)
   const [reviewError, setReviewError] = useState('')
+  const [analysis, setAnalysis] = useState(null)
+  const [analysisLoading, setAnalysisLoading] = useState(false)
+  const [analysisError, setAnalysisError] = useState('')
 
   async function loadAll() {
     setError('')
@@ -114,6 +117,9 @@ export function ManagerDashboard() {
     setReviewFeedback('')
     setReviewRating(5)
     setReviewError('')
+    setAnalysis(null)
+    setAnalysisError('')
+    setAnalysisLoading(false)
   }
 
   async function submitReview() {
@@ -137,6 +143,20 @@ export function ManagerDashboard() {
       setReviewError(getErrorMessage(err))
     } finally {
       setReviewSubmitting(false)
+    }
+  }
+
+  async function runAnalysis() {
+    if (!reviewing?._id) return
+    setAnalysisLoading(true)
+    setAnalysisError('')
+    try {
+      const res = await api.post(`/managers/reports/${reviewing._id}/analyze`)
+      setAnalysis(res.data?.analysis || null)
+    } catch (err) {
+      setAnalysisError(getErrorMessage(err))
+    } finally {
+      setAnalysisLoading(false)
     }
   }
 
@@ -362,6 +382,66 @@ export function ManagerDashboard() {
                   dangerouslySetInnerHTML={{ __html: reviewing.content || '<p>(empty)</p>' }}
                 />
               </Card>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-xs text-muted">Let AI analyse this report and suggest feedback.</div>
+                <Button size="sm" variant="secondary" onClick={runAnalysis} disabled={analysisLoading}>
+                  {analysisLoading ? 'Analysing…' : analysis ? 'Re-run AI analysis' : 'AI analyse report'}
+                </Button>
+              </div>
+
+              {analysisError ? (
+                <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-xs">
+                  {analysisError}
+                </div>
+              ) : null}
+
+              {analysis ? (
+                <Card className="border-border bg-card/80 px-3 py-2">
+                  <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                    AI analysis
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <div className="text-xs font-semibold text-muted">Summary</div>
+                      <div>{analysis.summary}</div>
+                    </div>
+                    <div className="grid gap-2 md:grid-cols-3">
+                      <div className="space-y-1">
+                        <div className="text-xs font-semibold text-muted">Stats</div>
+                        <div className="text-xs text-muted">
+                          {analysis.stats?.characters ?? 0} characters •{' '}
+                          {analysis.stats?.sentences ?? 0} sentences
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xs font-semibold text-muted">Strengths</div>
+                        <ul className="list-disc space-y-0.5 pl-4 text-xs">
+                          {(analysis.strengths || []).map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="text-xs font-semibold text-muted">Areas to improve</div>
+                        <ul className="list-disc space-y-0.5 pl-4 text-xs">
+                          {(analysis.weaknesses || []).map((w, i) => (
+                            <li key={i}>{w}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs font-semibold text-muted">Suggestions for feedback</div>
+                      <ul className="list-disc space-y-0.5 pl-4 text-xs">
+                        {(analysis.suggestions || []).map((s, i) => (
+                          <li key={i}>{s}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </Card>
+              ) : null}
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="space-y-1.5">
