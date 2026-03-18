@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import ReactQuill from 'react-quill'
 import 'react-quill/dist/quill.snow.css'
 import { api, getErrorMessage } from '../../utils/api.js'
+import { Badge, Button, Card, CardBody, CardHeader, Input, Label, Select } from '../../ui/components.jsx'
 
 function formatDate(value) {
   if (!value) return '—'
@@ -11,23 +12,23 @@ function formatDate(value) {
 }
 
 function StatusPill({ status }) {
-  if (status === 'approved') return <span className="pill ok">approved</span>
-  if (status === 'rejected') return <span className="pill bad">rejected</span>
-  return <span className="pill warn">pending</span>
+  if (status === 'approved') return <Badge variant="ok">approved</Badge>
+  if (status === 'rejected') return <Badge variant="bad">rejected</Badge>
+  return <Badge variant="warn">pending</Badge>
 }
 
 function Section({ title, subtitle, right, children }) {
   return (
-    <div className="card">
-      <div className="cardHeader" style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
         <div>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>{title}</div>
-          {subtitle ? <div className="muted" style={{ fontSize: 13 }}>{subtitle}</div> : null}
+          <div className="text-sm font-semibold">{title}</div>
+          {subtitle ? <div className="text-xs text-muted">{subtitle}</div> : null}
         </div>
         {right}
-      </div>
-      <div className="cardBody">{children}</div>
-    </div>
+      </CardHeader>
+      <CardBody>{children}</CardBody>
+    </Card>
   )
 }
 
@@ -92,19 +93,19 @@ export function InternDashboard() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
+    <div className="space-y-4">
+      <div className="flex items-baseline justify-between gap-3">
         <div>
-          <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.3 }}>Intern Dashboard</div>
-          <div className="muted">View weekly goals and submit rich-text progress reports.</div>
+          <div className="text-2xl font-semibold tracking-tight">Intern Dashboard</div>
+          <div className="text-sm text-muted">View weekly goals and submit rich-text progress reports.</div>
         </div>
-        <button className="btn" onClick={loadAll} disabled={loading}>
+        <Button onClick={loadAll} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+        </Button>
       </div>
 
       {error ? (
-        <div className="card" style={{ padding: 12, borderColor: 'rgba(255,92,119,0.45)', background: 'rgba(255,92,119,0.10)' }}>
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
           {error}
         </div>
       ) : null}
@@ -112,40 +113,36 @@ export function InternDashboard() {
       <Section
         title="Your weekly goals"
         subtitle="GET /api/interns/goals"
-        right={<span className="pill">{goals.length} goals</span>}
+        right={<Badge>{goals.length} goals</Badge>}
       >
         {loading ? (
-          <div className="muted">Loading…</div>
+          <div className="text-sm text-muted">Loading…</div>
         ) : goals.length === 0 ? (
-          <div className="muted">No goals assigned yet.</div>
+          <div className="text-sm text-muted">No goals assigned yet.</div>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-3">
             {goals.map((g) => (
               <div
                 key={g._id}
-                className="card"
-                style={{
-                  padding: 12,
-                  background: g._id === selectedGoalId ? 'rgba(139,92,246,0.10)' : 'rgba(255,255,255,0.04)',
-                  borderColor: g._id === selectedGoalId ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.10)',
-                  cursor: 'pointer',
-                }}
+                className={`cursor-pointer rounded-lg border px-3 py-2 ${
+                  g._id === selectedGoalId ? 'border-ring bg-primary/5' : 'border-border bg-card'
+                }`}
                 onClick={() => setSelectedGoalId(g._id)}
                 role="button"
                 tabIndex={0}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                  <div style={{ display: 'grid', gap: 4 }}>
-                    <div style={{ fontWeight: 850 }}>{g.title}</div>
-                    <div className="muted" style={{ fontSize: 13 }}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-semibold">{g.title}</div>
+                    <div className="text-xs text-muted">
                       week {formatDate(g.weekStart)} • deadline {formatDate(g.deadline)} • priority {g.priority}
                     </div>
                   </div>
-                  <span className="pill" style={{ fontSize: 12 }}>
+                  <Badge className="text-[11px]">
                     {reportGoalIds.has(g._id) ? 'reported' : 'not reported'}
-                  </span>
+                  </Badge>
                 </div>
-                <div className="muted" style={{ marginTop: 8, fontSize: 14, whiteSpace: 'pre-wrap' }}>
+                <div className="mt-2 whitespace-pre-wrap text-xs text-muted">
                   {g.description}
                 </div>
               </div>
@@ -159,51 +156,51 @@ export function InternDashboard() {
         subtitle="POST /api/interns/reports (Quill HTML)"
         right={
           selectedGoal ? (
-            <span className="pill" title={selectedGoal._id}>
+            <Badge title={selectedGoal._id}>
               goal: {selectedGoal.title}
-            </span>
+            </Badge>
           ) : null
         }
       >
         {goals.length === 0 ? (
-          <div className="muted">Once you have a goal, you can submit a report here.</div>
+          <div className="text-sm text-muted">Once you have a goal, you can submit a report here.</div>
         ) : (
-          <form onSubmit={submitReport} style={{ display: 'grid', gap: 12 }}>
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Selected goal
-              </label>
-              <select className="select" value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)}>
+          <form onSubmit={submitReport} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label>Selected goal</Label>
+              <Select value={selectedGoalId} onChange={(e) => setSelectedGoalId(e.target.value)}>
                 {goals.map((g) => (
                   <option key={g._id} value={g._id}>
                     {g.title}
                   </option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             {alreadySubmitted ? (
-              <div className="card" style={{ padding: 12, background: 'rgba(250,204,21,0.10)', borderColor: 'rgba(250,204,21,0.30)' }}>
+              <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm">
                 You already submitted a report for this goal.
               </div>
             ) : null}
 
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Report content
-              </label>
+            <div className="space-y-1.5">
+              <Label>Report content</Label>
               <ReactQuill theme="snow" value={content} onChange={setContent} />
             </div>
 
             {submitMsg ? (
-              <div className="card" style={{ padding: 12, background: 'rgba(255,255,255,0.04)' }}>
+              <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
                 {submitMsg}
               </div>
             ) : null}
 
-            <button className="btn btnPrimary" type="submit" disabled={submitting || alreadySubmitted || !content.trim()}>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={submitting || alreadySubmitted || !content.trim()}
+            >
               {submitting ? 'Submitting…' : 'Submit report'}
-            </button>
+            </Button>
           </form>
         )}
       </Section>
@@ -211,35 +208,34 @@ export function InternDashboard() {
       <Section
         title="My submitted reports"
         subtitle="GET /api/interns/reports"
-        right={<span className="pill">{reports.length} reports</span>}
+        right={<Badge>{reports.length} reports</Badge>}
       >
         {loading ? (
-          <div className="muted">Loading…</div>
+          <div className="text-sm text-muted">Loading…</div>
         ) : reports.length === 0 ? (
-          <div className="muted">No reports submitted yet.</div>
+          <div className="text-sm text-muted">No reports submitted yet.</div>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-3">
             {reports.map((r) => (
               <div
                 key={r._id}
-                className="card"
-                style={{ padding: 12, background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }}
+                className="rounded-lg border border-border bg-card px-3 py-2"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                  <div style={{ display: 'grid', gap: 2 }}>
-                    <div style={{ fontWeight: 850 }}>{r.weeklyGoal?.title || 'Weekly goal'}</div>
-                    <div className="muted" style={{ fontSize: 13 }}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-semibold">{r.weeklyGoal?.title || 'Weekly goal'}</div>
+                    <div className="text-xs text-muted">
                       submitted {formatDate(r.submittedAt || r.createdAt)} • week {formatDate(r.weeklyGoal?.weekStart)}
                     </div>
                   </div>
                   <StatusPill status={r.status} />
                 </div>
                 {r.feedback ? (
-                  <div style={{ marginTop: 10 }}>
-                    <div className="muted" style={{ fontSize: 12, marginBottom: 4 }}>
+                  <div className="mt-2 space-y-1">
+                    <div className="text-xs text-muted">
                       Feedback
                     </div>
-                    <div className="card" style={{ padding: 10, background: 'rgba(255,255,255,0.03)' }}>
+                    <div className="rounded-lg border border-border bg-card/70 px-3 py-2 text-sm">
                       {r.feedback}
                     </div>
                   </div>

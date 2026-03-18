@@ -1,18 +1,18 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext.jsx'
+import { useTheme } from '../state/ThemeContext.jsx'
+import { Badge, Button } from './components.jsx'
 
 function NavItem({ to, children }) {
   return (
     <NavLink
       to={to}
-      style={({ isActive }) => ({
-        padding: '8px 10px',
-        borderRadius: 10,
-        border: '1px solid rgba(255,255,255,0.12)',
-        background: isActive ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)',
-        color: 'rgba(255,255,255,0.86)',
-        textDecoration: 'none',
-      })}
+      className={({ isActive }) =>
+        [
+          'rounded-md border px-3 py-2 text-sm font-medium transition',
+          isActive ? 'border-border bg-card' : 'border-border/60 bg-transparent hover:bg-card/70',
+        ].join(' ')
+      }
     >
       {children}
     </NavLink>
@@ -22,49 +22,28 @@ function NavItem({ to, children }) {
 export function AppLayout() {
   const { auth, isAuthed, logout } = useAuth()
   const navigate = useNavigate()
+  const { toggle } = useTheme()
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="min-h-screen bg-app">
       <header
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          backdropFilter: 'blur(12px)',
-          background: 'rgba(11,16,32,0.55)',
-          borderBottom: '1px solid rgba(255,255,255,0.12)',
-        }}
+        className="sticky top-0 z-10 border-b border-border bg-bg/70 backdrop-blur"
       >
         <div
-          className="container"
-          style={{
-            display: 'flex',
-            gap: 12,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 0',
-          }}
+          className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4"
         >
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <span
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 12,
-                background: 'linear-gradient(135deg, rgba(139,92,246,0.95), rgba(45,212,191,0.65))',
-                border: '1px solid rgba(255,255,255,0.18)',
-                display: 'inline-block',
-              }}
-            />
-            <div style={{ lineHeight: 1.1 }}>
-              <div style={{ fontWeight: 700, letterSpacing: 0.2 }}>Internship Progress Tracker</div>
-              <div className="muted" style={{ fontSize: 13 }}>
-                Manager goals • Intern reports
-              </div>
+          <Link to="/" className="flex items-center gap-3">
+            <span className="h-9 w-9 rounded-xl border border-border bg-gradient-to-br from-primary to-emerald-400/70 shadow-soft" />
+            <div className="leading-tight">
+              <div className="text-sm font-semibold tracking-tight">Internship Progress Tracker</div>
+              <div className="text-xs text-muted">Manager goals • Intern reports</div>
             </div>
           </Link>
 
-          <nav style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <nav className="flex items-center gap-2">
+            <Button variant="ghost" onClick={toggle} type="button">
+              Toggle theme
+            </Button>
             {!isAuthed ? (
               <>
                 <NavItem to="/login">Login</NavItem>
@@ -73,39 +52,33 @@ export function AppLayout() {
             ) : (
               <>
                 <NavItem to={auth.role === 'manager' ? '/manager' : '/intern'}>Dashboard</NavItem>
-                <span className="pill" title={auth.email}>
+                <Badge title={auth.email}>
                   {auth.role} • {auth.name}
-                </span>
-                <button
-                  className="btn"
+                </Badge>
+                <Button
+                  variant="default"
                   onClick={() => {
                     logout()
                     navigate('/login', { replace: true })
                   }}
                 >
                   Logout
-                </button>
+                </Button>
               </>
             )}
           </nav>
         </div>
       </header>
 
-      <main style={{ flex: 1, padding: '28px 0 44px' }}>
-        <div className="container">
-          <Outlet />
-        </div>
+      <main className="mx-auto w-full max-w-6xl px-4 py-8">
+        <Outlet />
       </main>
 
-      <footer style={{ padding: '14px 0 22px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-          <span className="muted" style={{ fontSize: 13 }}>
-            MERN • JWT • Quill reports
-          </span>
-          <span className="muted" style={{ fontSize: 13 }}>
-            API: <code style={{ background: 'rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 8 }}>
-              {import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}
-            </code>
+      <footer className="border-t border-border bg-bg/40">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 text-xs text-muted">
+          <span>MERN • JWT • Quill reports</span>
+          <span className="rounded-md border border-border bg-card px-2 py-1 font-mono">
+            API: {import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}
           </span>
         </div>
       </footer>

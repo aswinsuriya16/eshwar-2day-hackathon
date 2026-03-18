@@ -1,177 +1,80 @@
-:root {
-  --bg: #0b1020;
-  --panel: rgba(255, 255, 255, 0.06);
-  --panel2: rgba(255, 255, 255, 0.09);
-  --border: rgba(255, 255, 255, 0.12);
-  --text: rgba(255, 255, 255, 0.9);
-  --muted: rgba(255, 255, 255, 0.65);
-  --danger: #ff5c77;
-  --ok: #2fe78f;
-  --brand: #8b5cf6;
-  --shadow: rgba(0, 0, 0, 0.35) 0 18px 50px -20px;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
-  color-scheme: dark;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  line-height: 1.4;
-}
+@layer base {
+  :root {
+    /* light */
+    --bg: 0 0% 100%;
+    --fg: 222.2 47.4% 11.2%;
+    --muted: 215.4 16.3% 46.9%;
+    --card: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 262.1 83.3% 57.8%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-fg: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-fg: 210 40% 98%;
+    --success: 142.1 76.2% 36.3%;
+    --success-fg: 210 40% 98%;
+  }
 
-* {
-  box-sizing: border-box;
-}
+  .dark {
+    /* dark */
+    --bg: 224 71% 4%;
+    --fg: 210 40% 98%;
+    --muted: 215 20.2% 65.1%;
+    --card: 224 71% 6%;
+    --popover: 224 71% 6%;
+    --border: 215 27.9% 16.9%;
+    --input: 215 27.9% 16.9%;
+    --ring: 263.4 70% 60%;
+    --primary: 263.4 70% 60%;
+    --primary-fg: 210 40% 98%;
+    --destructive: 0 62.8% 42.8%;
+    --destructive-fg: 210 40% 98%;
+    --success: 142.1 70.6% 45.3%;
+    --success-fg: 210 40% 98%;
+  }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(1200px 800px at 20% 0%, rgba(139, 92, 246, 0.28), transparent 55%),
-    radial-gradient(900px 700px at 90% 20%, rgba(45, 212, 191, 0.18), transparent 55%),
-    var(--bg);
-  color: var(--text);
-}
+  html,
+  body {
+    height: 100%;
+  }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-select,
-textarea {
-  font: inherit;
-}
-
-.container {
-  width: min(1100px, calc(100% - 32px));
-  margin: 0 auto;
-}
-
-.card {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow: var(--shadow);
-}
-
-.cardHeader {
-  padding: 16px 18px;
-  border-bottom: 1px solid var(--border);
-}
-
-.cardBody {
-  padding: 16px 18px;
-}
-
-.btn {
-  border: 1px solid var(--border);
-  background: var(--panel2);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: transform 120ms ease, background 120ms ease;
-}
-
-.btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.btn:active {
-  transform: translateY(1px);
-}
-
-.btnPrimary {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(45, 212, 191, 0.65));
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.btnPrimary:hover {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 1), rgba(45, 212, 191, 0.8));
-}
-
-.btnDanger {
-  background: rgba(255, 92, 119, 0.18);
-  border-color: rgba(255, 92, 119, 0.35);
-}
-
-.input,
-.select,
-.textarea {
-  width: 100%;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  outline: none;
-}
-
-.input:focus,
-.select:focus,
-.textarea:focus {
-  border-color: rgba(139, 92, 246, 0.65);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
-}
-
-.grid2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-@media (max-width: 820px) {
-  .grid2 {
-    grid-template-columns: 1fr;
+  body {
+    background-color: hsl(var(--bg));
+    color: hsl(var(--fg));
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-.muted {
-  color: var(--muted);
+@layer utilities {
+  .bg-app {
+    background:
+      radial-gradient(900px 700px at 15% 0%, hsl(var(--primary) / 0.18), transparent 55%),
+      radial-gradient(900px 700px at 85% 20%, hsl(173 80% 40% / 0.14), transparent 55%),
+      hsl(var(--bg));
+  }
 }
 
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.05);
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.pill.ok {
-  border-color: rgba(47, 231, 143, 0.35);
-  background: rgba(47, 231, 143, 0.12);
-  color: rgba(208, 255, 231, 0.9);
-}
-
-.pill.bad {
-  border-color: rgba(255, 92, 119, 0.45);
-  background: rgba(255, 92, 119, 0.12);
-  color: rgba(255, 215, 222, 0.92);
-}
-
-.pill.warn {
-  border-color: rgba(250, 204, 21, 0.45);
-  background: rgba(250, 204, 21, 0.12);
-  color: rgba(255, 244, 198, 0.92);
-}
-
-/* Quill (ReactQuill) dark-friendly tweaks */
+/* Quill (ReactQuill) theme integration */
 .ql-toolbar.ql-snow,
 .ql-container.ql-snow {
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-color: hsl(var(--border)) !important;
 }
 .ql-toolbar.ql-snow {
-  background: rgba(255, 255, 255, 0.05);
+  background: hsl(var(--card));
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;
 }
 .ql-container.ql-snow {
-  background: rgba(255, 255, 255, 0.04);
+  background: hsl(var(--card));
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
-  color: rgba(255, 255, 255, 0.9);
+  color: hsl(var(--fg));
 }
 .ql-editor {
   min-height: 180px;

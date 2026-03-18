@@ -1,18 +1,19 @@
 import { Link } from 'react-router-dom'
+import { Button, Card, CardBody } from '../ui/components.jsx'
 
 export function NotFoundPage() {
   return (
-    <div className="card">
-      <div className="cardBody" style={{ display: 'grid', gap: 10 }}>
-        <div style={{ fontSize: 22, fontWeight: 800 }}>Page not found</div>
-        <div className="muted">The page you’re looking for doesn’t exist.</div>
+    <Card>
+      <CardBody className="space-y-3">
+        <div className="text-xl font-semibold tracking-tight">Page not found</div>
+        <div className="text-sm text-muted">The page you’re looking for doesn’t exist.</div>
         <div>
-          <Link className="btn" to="/">
-            Go home
+          <Link to="/">
+            <Button>Go home</Button>
           </Link>
         </div>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   )
 }
 

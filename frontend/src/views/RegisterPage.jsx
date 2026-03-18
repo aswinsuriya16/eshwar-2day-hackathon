@@ -2,18 +2,15 @@ import { useMemo, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext.jsx'
 import { getErrorMessage } from '../utils/api.js'
+import { Button, Card, CardBody, CardHeader, Input, Label, Select } from '../ui/components.jsx'
 
 function Field({ label, children, hint }) {
   return (
-    <div style={{ display: 'grid', gap: 6 }}>
-      <label className="muted" style={{ fontSize: 13 }}>
-        {label}
-      </label>
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
       {children}
       {hint ? (
-        <div className="muted" style={{ fontSize: 12 }}>
-          {hint}
-        </div>
+        <div className="text-xs text-muted">{hint}</div>
       ) : null}
     </div>
   )
@@ -83,115 +80,110 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="card" style={{ maxWidth: 720, margin: '0 auto' }}>
-      <div className="cardHeader" style={{ display: 'grid', gap: 8 }}>
-        <div style={{ fontSize: 22, fontWeight: 800 }}>Register</div>
-        <div className="muted">Create a Manager or Intern account.</div>
-      </div>
-      <div className="cardBody" style={{ display: 'grid', gap: 14 }}>
-        <Field label="Role">
-          <select className="select" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="manager">Manager</option>
-            <option value="intern">Intern</option>
-          </select>
-        </Field>
-
-        <form onSubmit={onSubmit} style={{ display: 'grid', gap: 14 }}>
-          <div className="grid2">
-            <Field label="Name">
-              <input
-                className="input"
-                value={common.name}
-                onChange={(e) => setCommon((s) => ({ ...s, name: e.target.value }))}
-                placeholder="Your name"
-                required
-              />
-            </Field>
-            <Field label="Email">
-              <input
-                className="input"
-                value={common.email}
-                onChange={(e) => setCommon((s) => ({ ...s, email: e.target.value }))}
-                type="email"
-                placeholder="you@example.com"
-                required
-              />
-            </Field>
-          </div>
-
-          <Field label="Password" hint="Minimum 8 characters (backend requirement).">
-            <input
-              className="input"
-              value={common.password}
-              onChange={(e) => setCommon((s) => ({ ...s, password: e.target.value }))}
-              type="password"
-              placeholder="••••••••"
-              minLength={8}
-              required
-            />
+    <div className="mx-auto max-w-2xl">
+      <Card>
+        <CardHeader className="space-y-1">
+          <div className="text-xl font-semibold tracking-tight">Register</div>
+          <div className="text-sm text-muted">Create a Manager or Intern account.</div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <Field label="Role">
+            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="manager">Manager</option>
+              <option value="intern">Intern</option>
+            </Select>
           </Field>
 
-          {role === 'manager' ? (
-            <div className="grid2">
-              <Field label="Department (optional)">
-                <input
-                  className="input"
-                  value={managerExtra.department}
-                  onChange={(e) => setManagerExtra((s) => ({ ...s, department: e.target.value }))}
-                  placeholder="Engineering"
-                />
-              </Field>
-              <Field label="Company (optional)">
-                <input
-                  className="input"
-                  value={managerExtra.company}
-                  onChange={(e) => setManagerExtra((s) => ({ ...s, company: e.target.value }))}
-                  placeholder="Acme Inc."
-                />
-              </Field>
-            </div>
-          ) : (
-            <div className="grid2">
-              <Field label="Manager ID" hint="Ask your manager for their MongoDB _id (required by backend).">
-                <input
-                  className="input"
-                  value={internExtra.managerId}
-                  onChange={(e) => setInternExtra((s) => ({ ...s, managerId: e.target.value }))}
-                  placeholder="65f1c3…"
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-2">
+              <Field label="Name">
+                <Input
+                  value={common.name}
+                  onChange={(e) => setCommon((s) => ({ ...s, name: e.target.value }))}
+                  placeholder="Your name"
                   required
                 />
               </Field>
-              <Field label="Start date" hint="Format: YYYY-MM-DD">
-                <input
-                  className="input"
-                  value={internExtra.startDate}
-                  onChange={(e) => setInternExtra((s) => ({ ...s, startDate: e.target.value }))}
-                  type="date"
+              <Field label="Email">
+                <Input
+                  value={common.email}
+                  onChange={(e) => setCommon((s) => ({ ...s, email: e.target.value }))}
+                  type="email"
+                  placeholder="you@example.com"
                   required
                 />
               </Field>
             </div>
-          )}
 
-          {error ? (
-            <div className="card" style={{ padding: 12, borderColor: 'rgba(255,92,119,0.45)', background: 'rgba(255,92,119,0.10)' }}>
-              {error}
-            </div>
-          ) : null}
+            <Field label="Password" hint="Minimum 8 characters (backend requirement).">
+              <Input
+                value={common.password}
+                onChange={(e) => setCommon((s) => ({ ...s, password: e.target.value }))}
+                type="password"
+                placeholder="••••••••"
+                minLength={8}
+                required
+              />
+            </Field>
 
-          <button className="btn btnPrimary" type="submit" disabled={loading}>
-            {loading ? 'Creating account…' : `Create ${role} account`}
-          </button>
-        </form>
+            {role === 'manager' ? (
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field label="Department (optional)">
+                  <Input
+                    value={managerExtra.department}
+                    onChange={(e) => setManagerExtra((s) => ({ ...s, department: e.target.value }))}
+                    placeholder="Engineering"
+                  />
+                </Field>
+                <Field label="Company (optional)">
+                  <Input
+                    value={managerExtra.company}
+                    onChange={(e) => setManagerExtra((s) => ({ ...s, company: e.target.value }))}
+                    placeholder="Acme Inc."
+                  />
+                </Field>
+              </div>
+            ) : (
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field label="Manager ID" hint="Ask your manager for their MongoDB _id (required by backend).">
+                  <Input
+                    value={internExtra.managerId}
+                    onChange={(e) => setInternExtra((s) => ({ ...s, managerId: e.target.value }))}
+                    placeholder="65f1c3…"
+                    required
+                  />
+                </Field>
+                <Field label="Start date" hint="Format: YYYY-MM-DD">
+                  <Input
+                    value={internExtra.startDate}
+                    onChange={(e) => setInternExtra((s) => ({ ...s, startDate: e.target.value }))}
+                    type="date"
+                    required
+                  />
+                </Field>
+              </div>
+            )}
 
-        <div className="muted" style={{ fontSize: 14 }}>
-          Already have an account?{' '}
-          <Link to="/login" style={{ textDecoration: 'underline' }}>
-            Login
-          </Link>
-          .
-        </div>
-      </div>
+            {error ? (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
+                {error}
+              </div>
+            ) : null}
+
+            <Button className="w-full" variant="primary" type="submit" disabled={loading}>
+              {loading ? 'Creating account…' : `Create ${role} account`}
+            </Button>
+          </form>
+
+          <div className="text-sm text-muted">
+            Already have an account?{' '}
+            <Link to="/login" className="font-medium text-fg underline underline-offset-4">
+              Login
+            </Link>
+            .
+          </div>
+        </CardBody>
+      </Card>
     </div>
   )
 }

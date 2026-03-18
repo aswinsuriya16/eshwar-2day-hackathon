@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { api, getErrorMessage } from '../../utils/api.js'
+import { Badge, Button, Card, CardBody, CardHeader, Input, Label, Select, Textarea } from '../../ui/components.jsx'
 
 function formatDate(value) {
   if (!value) return '—'
@@ -9,23 +10,23 @@ function formatDate(value) {
 }
 
 function StatusPill({ status }) {
-  if (status === 'approved') return <span className="pill ok">approved</span>
-  if (status === 'rejected') return <span className="pill bad">rejected</span>
-  return <span className="pill warn">pending</span>
+  if (status === 'approved') return <Badge variant="ok">approved</Badge>
+  if (status === 'rejected') return <Badge variant="bad">rejected</Badge>
+  return <Badge variant="warn">pending</Badge>
 }
 
 function Section({ title, subtitle, right, children }) {
   return (
-    <div className="card">
-      <div className="cardHeader" style={{ display: 'flex', gap: 12, alignItems: 'center', justifyContent: 'space-between' }}>
+    <Card>
+      <CardHeader className="flex items-center justify-between gap-3">
         <div>
-          <div style={{ fontSize: 18, fontWeight: 800 }}>{title}</div>
-          {subtitle ? <div className="muted" style={{ fontSize: 13 }}>{subtitle}</div> : null}
+          <div className="text-sm font-semibold">{title}</div>
+          {subtitle ? <div className="text-xs text-muted">{subtitle}</div> : null}
         </div>
         {right}
-      </div>
-      <div className="cardBody">{children}</div>
-    </div>
+      </CardHeader>
+      <CardBody>{children}</CardBody>
+    </Card>
   )
 }
 
@@ -140,19 +141,19 @@ export function ManagerDashboard() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'baseline' }}>
+    <div className="space-y-4">
+      <div className="flex items-baseline justify-between gap-3">
         <div>
-          <div style={{ fontSize: 26, fontWeight: 900, letterSpacing: -0.3 }}>Manager Dashboard</div>
-          <div className="muted">Assign weekly goals and review intern reports.</div>
+          <div className="text-2xl font-semibold tracking-tight">Manager Dashboard</div>
+          <div className="text-sm text-muted">Assign weekly goals and review intern reports.</div>
         </div>
-        <button className="btn" onClick={loadAll} disabled={loading}>
+        <Button onClick={loadAll} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
-        </button>
+        </Button>
       </div>
 
       {error ? (
-        <div className="card" style={{ padding: 12, borderColor: 'rgba(255,92,119,0.45)', background: 'rgba(255,92,119,0.10)' }}>
+        <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
           {error}
         </div>
       ) : null}
@@ -160,32 +161,31 @@ export function ManagerDashboard() {
       <Section
         title="Your interns"
         subtitle="Fetched from /api/managers/interns"
-        right={<span className="pill">{interns.length} interns</span>}
+        right={<Badge>{interns.length} interns</Badge>}
       >
         {loading ? (
-          <div className="muted">Loading…</div>
+          <div className="text-sm text-muted">Loading…</div>
         ) : interns.length === 0 ? (
-          <div className="muted">
+          <div className="text-sm text-muted">
             No interns found. Interns must register with your managerId.
           </div>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-3">
             {interns.map((i) => (
               <div
                 key={i._id}
-                className="card"
-                style={{ padding: 12, background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }}
+                className="rounded-lg border border-border bg-card px-3 py-2"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                  <div style={{ display: 'grid', gap: 2 }}>
-                    <div style={{ fontWeight: 800 }}>{i.name}</div>
-                    <div className="muted" style={{ fontSize: 13 }}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-semibold">{i.name}</div>
+                    <div className="text-xs text-muted">
                       {i.email} • start {formatDate(i.startDate)}
                     </div>
                   </div>
-                  <span className="pill" title={i._id}>
+                  <Badge title={i._id}>
                     id: {String(i._id).slice(0, 8)}…
-                  </span>
+                  </Badge>
                 </div>
               </div>
             ))}
@@ -194,14 +194,11 @@ export function ManagerDashboard() {
       </Section>
 
       <Section title="Assign weekly goal" subtitle="POST /api/managers/goals">
-        <form onSubmit={submitGoal} style={{ display: 'grid', gap: 12 }}>
-          <div className="grid2">
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Assign to intern
-              </label>
-              <select
-                className="select"
+        <form onSubmit={submitGoal} className="space-y-3">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Assign to intern</Label>
+              <Select
                 value={goalForm.assignedTo}
                 onChange={(e) => setGoalForm((s) => ({ ...s, assignedTo: e.target.value }))}
                 required
@@ -216,43 +213,34 @@ export function ManagerDashboard() {
                     </option>
                   ))
                 )}
-              </select>
+              </Select>
             </div>
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Priority
-              </label>
-              <select
-                className="select"
+            <div className="space-y-1.5">
+              <Label>Priority</Label>
+              <Select
                 value={goalForm.priority}
                 onChange={(e) => setGoalForm((s) => ({ ...s, priority: e.target.value }))}
               >
                 <option value="low">low</option>
                 <option value="medium">medium</option>
                 <option value="high">high</option>
-              </select>
+              </Select>
             </div>
           </div>
 
-          <div className="grid2">
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Week start
-              </label>
-              <input
-                className="input"
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Week start</Label>
+              <Input
                 type="date"
                 value={goalForm.weekStart}
                 onChange={(e) => setGoalForm((s) => ({ ...s, weekStart: e.target.value }))}
                 required
               />
             </div>
-            <div style={{ display: 'grid', gap: 6 }}>
-              <label className="muted" style={{ fontSize: 13 }}>
-                Deadline
-              </label>
-              <input
-                className="input"
+            <div className="space-y-1.5">
+              <Label>Deadline</Label>
+              <Input
                 type="date"
                 value={goalForm.deadline}
                 onChange={(e) => setGoalForm((s) => ({ ...s, deadline: e.target.value }))}
@@ -261,12 +249,9 @@ export function ManagerDashboard() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gap: 6 }}>
-            <label className="muted" style={{ fontSize: 13 }}>
-              Title
-            </label>
-            <input
-              className="input"
+          <div className="space-y-1.5">
+            <Label>Title</Label>
+            <Input
               value={goalForm.title}
               onChange={(e) => setGoalForm((s) => ({ ...s, title: e.target.value }))}
               placeholder="e.g., Build API integration"
@@ -274,12 +259,9 @@ export function ManagerDashboard() {
             />
           </div>
 
-          <div style={{ display: 'grid', gap: 6 }}>
-            <label className="muted" style={{ fontSize: 13 }}>
-              Description
-            </label>
-            <textarea
-              className="textarea"
+          <div className="space-y-1.5">
+            <Label>Description</Label>
+            <Textarea
               value={goalForm.description}
               onChange={(e) => setGoalForm((s) => ({ ...s, description: e.target.value }))}
               placeholder="Goal details, acceptance criteria, links…"
@@ -288,12 +270,9 @@ export function ManagerDashboard() {
             />
           </div>
 
-          <div style={{ display: 'grid', gap: 6 }}>
-            <label className="muted" style={{ fontSize: 13 }}>
-              Expected metrics (optional)
-            </label>
-            <textarea
-              className="textarea"
+          <div className="space-y-1.5">
+            <Label>Expected metrics (optional)</Label>
+            <Textarea
               value={goalForm.expectedMetrics}
               onChange={(e) => setGoalForm((s) => ({ ...s, expectedMetrics: e.target.value }))}
               placeholder="e.g., 3 PRs merged, 1 demo video…"
@@ -302,48 +281,48 @@ export function ManagerDashboard() {
           </div>
 
           {goalMsg ? (
-            <div className="card" style={{ padding: 12, background: 'rgba(255,255,255,0.04)' }}>
+            <div className="rounded-lg border border-border bg-card px-3 py-2 text-sm">
               {goalMsg}
             </div>
           ) : null}
 
-          <button className="btn btnPrimary" type="submit" disabled={goalSubmitting || internOptions.length === 0}>
+          <Button variant="primary" type="submit" disabled={goalSubmitting || internOptions.length === 0}>
             {goalSubmitting ? 'Assigning…' : 'Assign goal'}
-          </button>
+          </Button>
         </form>
       </Section>
 
       <Section
         title="Pending reports"
         subtitle="GET /api/managers/reports/pending (global pending list)"
-        right={<span className="pill">{pending.length} pending</span>}
+        right={<Badge>{pending.length} pending</Badge>}
       >
         {loading ? (
-          <div className="muted">Loading…</div>
+          <div className="text-sm text-muted">Loading…</div>
         ) : pending.length === 0 ? (
-          <div className="muted">No pending reports.</div>
+          <div className="text-sm text-muted">No pending reports.</div>
         ) : (
-          <div style={{ display: 'grid', gap: 10 }}>
+          <div className="grid gap-3">
             {pending.map((r) => (
               <div
                 key={r._id}
-                className="card"
-                style={{ padding: 12, background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }}
+                className="rounded-lg border border-border bg-card px-3 py-2"
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center' }}>
-                  <div style={{ display: 'grid', gap: 2 }}>
-                    <div style={{ fontWeight: 850 }}>
-                      {r.weeklyGoal?.title || 'Weekly goal'} <span className="muted" style={{ fontWeight: 500 }}>• {formatDate(r.weeklyGoal?.weekStart)}</span>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="space-y-0.5">
+                    <div className="text-sm font-semibold">
+                      {r.weeklyGoal?.title || 'Weekly goal'}{' '}
+                      <span className="text-xs font-normal text-muted">• {formatDate(r.weeklyGoal?.weekStart)}</span>
                     </div>
-                    <div className="muted" style={{ fontSize: 13 }}>
+                    <div className="text-xs text-muted">
                       Intern: {r.intern?.name || '—'} ({r.intern?.email || '—'})
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <div className="flex items-center gap-2">
                     <StatusPill status={r.status} />
-                    <button className="btn btnPrimary" onClick={() => openReview(r)}>
+                    <Button variant="primary" size="sm" onClick={() => openReview(r)}>
                       Review
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -356,63 +335,45 @@ export function ManagerDashboard() {
         <div
           role="dialog"
           aria-modal="true"
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.55)',
-            display: 'grid',
-            placeItems: 'center',
-            padding: 16,
-          }}
+          className="fixed inset-0 grid place-items-center bg-black/60 p-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setReviewing(null)
           }}
         >
-          <div className="card" style={{ width: 'min(980px, 100%)', maxHeight: '85vh', overflow: 'auto' }}>
-            <div className="cardHeader" style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
-              <div style={{ display: 'grid', gap: 4 }}>
-                <div style={{ fontSize: 18, fontWeight: 850 }}>{reviewing.weeklyGoal?.title || 'Report'}</div>
-                <div className="muted" style={{ fontSize: 13 }}>
+          <Card className="max-h-[85vh] w-full max-w-4xl overflow-auto">
+            <CardHeader className="flex items-center justify-between gap-3">
+              <div className="space-y-1">
+                <div className="text-sm font-semibold">{reviewing.weeklyGoal?.title || 'Report'}</div>
+                <div className="text-xs text-muted">
                   {reviewing.intern?.name} • {reviewing.intern?.email} • submitted {formatDate(reviewing.submittedAt || reviewing.createdAt)}
                 </div>
               </div>
-              <button className="btn" onClick={() => setReviewing(null)}>
+              <Button variant="ghost" onClick={() => setReviewing(null)}>
                 Close
-              </button>
-            </div>
-            <div className="cardBody" style={{ display: 'grid', gap: 12 }}>
-              <div className="card" style={{ padding: 12, background: 'rgba(255,255,255,0.04)' }}>
-                <div className="muted" style={{ fontSize: 13, marginBottom: 8 }}>
+              </Button>
+            </CardHeader>
+            <CardBody className="space-y-3">
+              <Card className="border-border bg-card/80 px-3 py-2">
+                <div className="mb-1 text-xs text-muted">
                   Report content (HTML)
                 </div>
                 <div
-                  style={{
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    borderRadius: 12,
-                    padding: 12,
-                    background: 'rgba(0,0,0,0.20)',
-                    overflowX: 'auto',
-                  }}
+                  className="max-h-72 overflow-auto rounded-md border border-border bg-bg px-3 py-2 text-sm"
                   dangerouslySetInnerHTML={{ __html: reviewing.content || '<p>(empty)</p>' }}
                 />
-              </div>
+              </Card>
 
-              <div className="grid2">
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <label className="muted" style={{ fontSize: 13 }}>
-                    Action
-                  </label>
-                  <select className="select" value={reviewAction} onChange={(e) => setReviewAction(e.target.value)}>
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <Label>Action</Label>
+                  <Select value={reviewAction} onChange={(e) => setReviewAction(e.target.value)}>
                     <option value="approve">approve</option>
                     <option value="reject">reject</option>
-                  </select>
+                  </Select>
                 </div>
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <label className="muted" style={{ fontSize: 13 }}>
-                    Rating (approve only)
-                  </label>
-                  <input
-                    className="input"
+                <div className="space-y-1.5">
+                  <Label>Rating (approve only)</Label>
+                  <Input
                     type="number"
                     min={1}
                     max={10}
@@ -423,12 +384,9 @@ export function ManagerDashboard() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gap: 6 }}>
-                <label className="muted" style={{ fontSize: 13 }}>
-                  Feedback {reviewAction === 'reject' ? '(required for reject)' : '(optional)'}
-                </label>
-                <textarea
-                  className="textarea"
+              <div className="space-y-1.5">
+                <Label>Feedback {reviewAction === 'reject' ? '(required for reject)' : '(optional)'}</Label>
+                <Textarea
                   value={reviewFeedback}
                   onChange={(e) => setReviewFeedback(e.target.value)}
                   rows={3}
@@ -438,26 +396,26 @@ export function ManagerDashboard() {
               </div>
 
               {reviewError ? (
-                <div className="card" style={{ padding: 12, borderColor: 'rgba(255,92,119,0.45)', background: 'rgba(255,92,119,0.10)' }}>
+                <div className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm">
                   {reviewError}
                 </div>
               ) : null}
 
-              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-                <button className="btn" onClick={() => setReviewing(null)} disabled={reviewSubmitting}>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setReviewing(null)} disabled={reviewSubmitting}>
                   Cancel
-                </button>
-                <button
-                  className={reviewAction === 'reject' ? 'btn btnDanger' : 'btn btnPrimary'}
+                </Button>
+                <Button
+                  variant={reviewAction === 'reject' ? 'destructive' : 'primary'}
                   onClick={submitReview}
                   disabled={reviewSubmitting || (reviewAction === 'reject' && !reviewFeedback.trim())}
                   type="button"
                 >
                   {reviewSubmitting ? 'Submitting…' : reviewAction === 'reject' ? 'Reject' : 'Approve'}
-                </button>
+                </Button>
               </div>
-            </div>
-          </div>
+            </CardBody>
+          </Card>
         </div>
       ) : null}
     </div>

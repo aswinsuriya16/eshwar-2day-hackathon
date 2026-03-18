@@ -1,5 +1,6 @@
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../state/AuthContext.jsx'
+import { Badge, Button, Card, CardBody, CardHeader } from '../ui/components.jsx'
 
 export function HomePage() {
   const { isAuthed, auth } = useAuth()
@@ -9,59 +10,84 @@ export function HomePage() {
   }
 
   return (
-    <div style={{ display: 'grid', gap: 18 }}>
-      <div className="card">
-        <div className="cardHeader">
-          <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>Internship Progress Tracker</div>
-          <div style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.4 }}>Weekly goals. Rich reports. Fast reviews.</div>
-        </div>
-        <div className="cardBody">
-          <div className="grid2">
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>For managers</div>
-              <div className="muted" style={{ marginBottom: 12 }}>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge>React</Badge>
+            <Badge>JWT</Badge>
+            <Badge>Quill</Badge>
+          </div>
+          <div className="text-3xl font-semibold tracking-tight md:text-4xl">
+            Weekly goals. Rich reports. Fast reviews.
+          </div>
+          <div className="text-sm text-muted">
+            A clean portal for managers to assign goals and review progress, and for interns to submit reports.
+          </div>
+        </CardHeader>
+        <CardBody>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="text-sm font-semibold">For managers</div>
+              <div className="mt-1 text-sm text-muted">
                 Assign weekly goals, review pending reports, approve/reject with feedback and rating.
               </div>
-              <Link className="btn btnPrimary" to="/login" style={{ display: 'inline-block' }}>
-                Login as Manager
-              </Link>
-            </div>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>For interns</div>
-              <div className="muted" style={{ marginBottom: 12 }}>
-                View your goals, submit rich-text progress reports, and track status.
+              <div className="mt-4 flex gap-2">
+                <Link to="/login">
+                  <Button variant="primary">Login as Manager</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="default">Register</Button>
+                </Link>
               </div>
-              <Link className="btn" to="/login" style={{ display: 'inline-block' }}>
-                Login as Intern
-              </Link>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-4">
+              <div className="text-sm font-semibold">For interns</div>
+              <div className="mt-1 text-sm text-muted">
+                View goals, submit rich-text progress reports, and track submission status.
+              </div>
+              <div className="mt-4 flex gap-2">
+                <Link to="/login">
+                  <Button variant="default">Login as Intern</Button>
+                </Link>
+                <Link to="/register">
+                  <Button variant="ghost">Register</Button>
+                </Link>
+              </div>
             </div>
           </div>
-          <div style={{ marginTop: 14 }} className="muted">
-            New here? <Link to="/register" style={{ textDecoration: 'underline' }}>Create an account</Link>.
+          <div className="mt-4 text-sm text-muted">
+            New here?{' '}
+            <Link to="/register" className="font-medium text-fg underline underline-offset-4">
+              Create an account
+            </Link>
+            .
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
 
-      <div className="card">
-        <div className="cardBody" style={{ textAlign: 'left' }}>
-          <div style={{ fontWeight: 700, marginBottom: 6 }}>Backend endpoints used</div>
-          <div className="muted" style={{ display: 'grid', gap: 6 }}>
-            <div>
-              <code>/api/managers/register</code>, <code>/api/managers/login</code>
+      <Card>
+        <CardHeader>
+          <div className="text-sm font-semibold">API endpoints used</div>
+          <div className="text-xs text-muted">These are the exact backend routes the UI calls.</div>
+        </CardHeader>
+        <CardBody>
+          <div className="grid gap-2 text-sm">
+            <div className="rounded-md border border-border bg-card px-3 py-2 font-mono text-xs text-muted">
+              /api/managers/register, /api/managers/login
             </div>
-            <div>
-              <code>/api/interns/register</code>, <code>/api/interns/login</code>
+            <div className="rounded-md border border-border bg-card px-3 py-2 font-mono text-xs text-muted">
+              /api/interns/register, /api/interns/login
             </div>
-            <div>
-              <code>/api/managers/interns</code>, <code>/api/managers/goals</code>, <code>/api/managers/reports/pending</code>,{' '}
-              <code>/api/managers/reports/:id/approve</code>, <code>/api/managers/reports/:id/reject</code>
+            <div className="rounded-md border border-border bg-card px-3 py-2 font-mono text-xs text-muted">
+              /api/managers/interns, /api/managers/goals, /api/managers/reports/pending, /api/managers/reports/:id/approve, /api/managers/reports/:id/reject
             </div>
-            <div>
-              <code>/api/interns/goals</code>, <code>/api/interns/reports</code>
+            <div className="rounded-md border border-border bg-card px-3 py-2 font-mono text-xs text-muted">
+              /api/interns/goals, /api/interns/reports
             </div>
           </div>
-        </div>
-      </div>
+        </CardBody>
+      </Card>
     </div>
   )
 }
