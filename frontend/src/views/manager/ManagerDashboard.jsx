@@ -35,6 +35,7 @@ export function ManagerDashboard() {
   const [pending, setPending] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('interns') // interns | goals | reports
 
   const [goalForm, setGoalForm] = useState({
     assignedTo: '',
@@ -165,7 +166,9 @@ export function ManagerDashboard() {
       <div className="flex items-baseline justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold tracking-tight">Manager Dashboard</div>
-          <div className="text-sm text-muted">Assign weekly goals and review intern reports.</div>
+          <div className="text-sm text-muted">
+            Quickly switch between interns, goals, and report reviews.
+          </div>
         </div>
         <Button onClick={loadAll} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
@@ -178,11 +181,48 @@ export function ManagerDashboard() {
         </div>
       ) : null}
 
-      <Section
-        title="Your interns"
-        subtitle="Fetched from /api/managers/interns"
-        right={<Badge>{interns.length} interns</Badge>}
-      >
+      <div className="flex gap-2 rounded-lg border border-border bg-card px-2 py-1 text-sm">
+        <button
+          type="button"
+          onClick={() => setActiveTab('interns')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'interns'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          Interns
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('goals')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'goals'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          Assign goal
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('reports')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'reports'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          Reports & AI review
+        </button>
+      </div>
+
+      {activeTab === 'interns' && (
+        <Section
+          title="Your interns"
+          subtitle="Fetched from /api/managers/interns"
+          right={<Badge>{interns.length} interns</Badge>}
+        >
         {loading ? (
           <div className="text-sm text-muted">Loading…</div>
         ) : interns.length === 0 ? (
@@ -211,9 +251,11 @@ export function ManagerDashboard() {
             ))}
           </div>
         )}
-      </Section>
+        </Section>
+      )}
 
-      <Section title="Assign weekly goal" subtitle="POST /api/managers/goals">
+      {activeTab === 'goals' && (
+        <Section title="Assign weekly goal" subtitle="POST /api/managers/goals">
         <form onSubmit={submitGoal} className="space-y-3">
           <div className="grid gap-3 md:grid-cols-2">
             <div className="space-y-1.5">
@@ -306,17 +348,23 @@ export function ManagerDashboard() {
             </div>
           ) : null}
 
-          <Button variant="primary" type="submit" disabled={goalSubmitting || internOptions.length === 0}>
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={goalSubmitting || internOptions.length === 0}
+          >
             {goalSubmitting ? 'Assigning…' : 'Assign goal'}
           </Button>
         </form>
       </Section>
+      )}
 
-      <Section
-        title="Pending reports"
-        subtitle="GET /api/managers/reports/pending (global pending list)"
-        right={<Badge>{pending.length} pending</Badge>}
-      >
+      {activeTab === 'reports' && (
+        <Section
+          title="Pending reports"
+          subtitle="GET /api/managers/reports/pending (global pending list)"
+          right={<Badge>{pending.length} pending</Badge>}
+        >
         {loading ? (
           <div className="text-sm text-muted">Loading…</div>
         ) : pending.length === 0 ? (
@@ -350,6 +398,7 @@ export function ManagerDashboard() {
           </div>
         )}
       </Section>
+      )}
 
       {reviewing ? (
         <div

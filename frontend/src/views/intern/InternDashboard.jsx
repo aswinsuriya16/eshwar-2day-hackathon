@@ -37,6 +37,7 @@ export function InternDashboard() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('goals') // goals | submit | reports
 
   const [selectedGoalId, setSelectedGoalId] = useState('')
   const [content, setContent] = useState('')
@@ -97,7 +98,9 @@ export function InternDashboard() {
       <div className="flex items-baseline justify-between gap-3">
         <div>
           <div className="text-2xl font-semibold tracking-tight">Intern Dashboard</div>
-          <div className="text-sm text-muted">View weekly goals and submit rich-text progress reports.</div>
+          <div className="text-sm text-muted">
+            Switch between goals, submitting reports, and your history.
+          </div>
         </div>
         <Button onClick={loadAll} disabled={loading}>
           {loading ? 'Refreshing…' : 'Refresh'}
@@ -110,11 +113,48 @@ export function InternDashboard() {
         </div>
       ) : null}
 
-      <Section
-        title="Your weekly goals"
-        subtitle="GET /api/interns/goals"
-        right={<Badge>{goals.length} goals</Badge>}
-      >
+      <div className="flex gap-2 rounded-lg border border-border bg-card px-2 py-1 text-sm">
+        <button
+          type="button"
+          onClick={() => setActiveTab('goals')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'goals'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          View goals
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('submit')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'submit'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          Submit report
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('reports')}
+          className={`rounded-md px-3 py-1.5 text-xs font-medium ${
+            activeTab === 'reports'
+              ? 'bg-primary text-primary-foreground'
+              : 'text-muted hover:bg-muted'
+          }`}
+        >
+          My reports
+        </button>
+      </div>
+
+      {activeTab === 'goals' && (
+        <Section
+          title="Your weekly goals"
+          subtitle="GET /api/interns/goals"
+          right={<Badge>{goals.length} goals</Badge>}
+        >
         {loading ? (
           <div className="text-sm text-muted">Loading…</div>
         ) : goals.length === 0 ? (
@@ -149,19 +189,21 @@ export function InternDashboard() {
             ))}
           </div>
         )}
-      </Section>
+        </Section>
+      )}
 
-      <Section
-        title="Submit report"
-        subtitle="POST /api/interns/reports (Quill HTML)"
-        right={
-          selectedGoal ? (
-            <Badge title={selectedGoal._id}>
-              goal: {selectedGoal.title}
-            </Badge>
-          ) : null
-        }
-      >
+      {activeTab === 'submit' && (
+        <Section
+          title="Submit report"
+          subtitle="POST /api/interns/reports (Quill HTML)"
+          right={
+            selectedGoal ? (
+              <Badge title={selectedGoal._id}>
+                goal: {selectedGoal.title}
+              </Badge>
+            ) : null
+          }
+        >
         {goals.length === 0 ? (
           <div className="text-sm text-muted">Once you have a goal, you can submit a report here.</div>
         ) : (
@@ -194,22 +236,20 @@ export function InternDashboard() {
               </div>
             ) : null}
 
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={submitting || alreadySubmitted || !content.trim()}
-            >
+            <Button variant="primary" type="submit" disabled={submitting || alreadySubmitted || !content.trim()}>
               {submitting ? 'Submitting…' : 'Submit report'}
             </Button>
           </form>
         )}
       </Section>
+      )}
 
-      <Section
-        title="My submitted reports"
-        subtitle="GET /api/interns/reports"
-        right={<Badge>{reports.length} reports</Badge>}
-      >
+      {activeTab === 'reports' && (
+        <Section
+          title="My submitted reports"
+          subtitle="GET /api/interns/reports"
+          right={<Badge>{reports.length} reports</Badge>}
+        >
         {loading ? (
           <div className="text-sm text-muted">Loading…</div>
         ) : reports.length === 0 ? (
@@ -245,6 +285,7 @@ export function InternDashboard() {
           </div>
         )}
       </Section>
+      )}
     </div>
   )
 }
